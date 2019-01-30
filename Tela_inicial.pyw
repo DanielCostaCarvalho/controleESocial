@@ -1,4 +1,5 @@
 from tkinter import *
+from Tela_Incluir import *
 
 class TelaInicial(Frame):
     def __init__(self):
@@ -7,7 +8,7 @@ class TelaInicial(Frame):
         menubar = Menu(self.master)
         self.master.config(menu = menubar)
         menuEmpresa = Menu(menubar)
-        menuEmpresa.add_command(label="Inclusão", command = self.incluir)
+        menuEmpresa.add_command(label="Inclusão", command = Tela_Incluir)
         menuEmpresa.add_command(label="Modificação", command = self.modificar)
         menuListagem = Menu(menubar)
         menuListagem.add_command(label="Listar pendentes da fase 1", command = self.listar1)
@@ -16,8 +17,6 @@ class TelaInicial(Frame):
         menubar.add_cascade(label = "Empresa", menu = menuEmpresa)
         menubar.add_cascade(label="Relatórios", menu=menuListagem)
 
-    def incluir(self):
-        pass
 
     def modificar(self):
         pass
@@ -33,5 +32,6 @@ class TelaInicial(Frame):
 
 
 raiz = Tk()
+raiz.geometry("800x600")
 app = TelaInicial()
 raiz.mainloop()
