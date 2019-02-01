@@ -92,7 +92,14 @@ class TelaIncluir(TelaInicial):
         print(e)
 
     def limpar(self):
-        pass
+        self.eEmpresa.delete(0, 'end')
+        self.eObs.delete(0, 'end')
+        enviou1=self.cEnviou1.deselect()
+        passou1=self.cPassou1.deselect()
+        enviou2=self.cEnviou2.deselect()
+        passou2=self.cPassou2.deselect()
+        enviou3=self.cEnviou3.deselect()
+        passou3=self.cPassou3.deselect()
 
 raiz = Tk()
 raiz.geometry("400x300")
