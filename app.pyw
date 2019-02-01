@@ -11,10 +11,13 @@ class Empresa:
         self.passou3 = passou3
         self.observacao = observacao
 
+    def __str__(self):
+        return "Nome: {}\nFase1\nEnviou: {} Passou: {}\nFase2\nEnviou: {} Passou: {}\nFase3\nEnviou: {} Passou: {}\nObservação: {}\n\n".format(self.nome, self.enviou1, self.passou1, self.enviou2, self.passou2, self.enviou3, self.passou3, self.observacao)
+
 class TelaInicial(Frame):
     def __init__(self):
         super().__init__()
-        self.master.title("teste")
+        self.master.title("Controle eSocial")
         menubar = Menu(self.master)
         self.master.config(menu = menubar)
         menuEmpresa = Menu(menubar)
@@ -43,19 +46,53 @@ class TelaInicial(Frame):
 class TelaIncluir(TelaInicial):
     def __init__(self):
         super().__init__()
-        self.master.title("novo")
-        lTitulo = Label(self.master, text="Incluir Empresa", font="Arial 14 bold").grid(row=0)
-        lEmpresa = Label(self.master, text="Nome da Empresa:").grid(row=1)
-        eEmpresa = Entry(self.master).grid(row=1, column=1)
-        lFase1 = Label(self.master, text="Fase 1", font="Arial 10 bold").grid(row=2)
-        cEnviou1 = Checkbutton(self.master, text="Enviou").grid(row=3, column=0)
-        cLancou1 = Checkbutton(self.master, text="Lançou").grid(row=3, column=1)
-        lFase2 = Label(self.master, text="Fase 2", font="Arial 10 bold").grid(row=4)
-        cEnviou2 = Checkbutton(self.master, text="Enviou").grid(row=5, column=0)
-        cLancou2 = Checkbutton(self.master, text="Lançou").grid(row=5, column=1)
-        lFase3 = Label(self.master, text="Fase 3", font="Arial 10 bold").grid(row=6)
-        cEnviou3 = Checkbutton(self.master, text="Enviou").grid(row=7, column=0)
-        cLancou3 = Checkbutton(self.master, text="Lançou").grid(row=7, column=1)
+        self.master.title("Incluir Empresa")
+        self.lTitulo = Label(self.master, text="Incluir Empresa", font="Arial 14 bold").grid(row=0)
+        self.lEmpresa = Label(self.master, text="Nome da Empresa:").grid(row=1)
+        self.eEmpresa = Entry(self.master)
+        self.eEmpresa.grid(row=1, column=1)
+        self.lFase1 = Label(self.master, text="Fase 1", font="Arial 10 bold").grid(row=2)
+        self.enviou1=IntVar()
+        self.cEnviou1 = Checkbutton(self.master, text="Enviou", variable=self.enviou1)
+        self.cEnviou1.grid(row=3, column=0)
+        self.passou1=IntVar()
+        self.cPassou1 = Checkbutton(self.master, text="Passou", variable=self.passou1)
+        self.cPassou1.grid(row=3, column=1)
+        self.lFase2 = Label(self.master, text="Fase 2", font="Arial 10 bold").grid(row=4)
+        self.enviou2=IntVar()
+        self.cEnviou2 = Checkbutton(self.master, text="Enviou", variable=self.enviou2)
+        self.cEnviou2.grid(row=5, column=0)
+        self.passou2=IntVar()
+        self.cPassou2 = Checkbutton(self.master, text="Passou", variable=self.passou2)
+        self.cPassou2.grid(row=5, column=1)
+        self.lFase3 = Label(self.master, text="Fase 3", font="Arial 10 bold").grid(row=6)
+        self.enviou3=IntVar()
+        self.cEnviou3 = Checkbutton(self.master, text="Enviou", variable=self.enviou3)
+        self.cEnviou3.grid(row=7, column=0)
+        self.passou3=IntVar()
+        self.cPassou3 = Checkbutton(self.master, text="Passou", variable=self.passou3)
+        self.cPassou3.grid(row=7, column=1)
+        self.lObs = Label(self.master, text="Observação:").grid(row=8)
+        self.eObs = Entry(self.master)
+        self.eObs.grid(row=8, column=1)
+        self.bSalvar = Button(self.master, command=self.salvar, text="Salvar").grid(row=9, column=0)
+        self.bLimpar = Button(self.master, command=self.limpar, text="Limpar").grid(row=9, column=5)
+
+    def salvar(self):
+        e = Empresa(self.eEmpresa.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
+        self.eEmpresa.delete(0, 'end')
+        self.eObs.delete(0, 'end')
+        enviou1=self.cEnviou1.deselect()
+        passou1=self.cPassou1.deselect()
+        enviou2=self.cEnviou2.deselect()
+        passou2=self.cPassou2.deselect()
+        enviou3=self.cEnviou3.deselect()
+        passou3=self.cPassou3.deselect()
+
+        print(e)
+
+    def limpar(self):
+        pass
 
 raiz = Tk()
 raiz.geometry("400x300")
