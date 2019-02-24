@@ -6,8 +6,8 @@ class Empresa:
         self.nome = nome
         self.cnpj = cnpj
         self.enviou1 = enviou1
-        self.enviou2 = enviou2
         self.enviou3 = enviou3
+        self.enviou2 = enviou2
         self.passou1 = passou1
         self.passou2 = passou2
         self.passou3 = passou3
@@ -17,12 +17,8 @@ class Empresa:
         conn = sqlite3.connect('controleESocial.db')
         cursor = conn.cursor()
         comando="insert into Empresa(nome, enviou1, enviou2, enviou3, passou1, passou2, passou3, obs, cnpj) values ('{}',{},{},{},{},{},{},'{}','{}')".format(self.nome, self.enviou1, self.enviou2, self.enviou3, self.passou1, self.passou2, self.passou3, self.observacao, self.cnpj)
-        print(comando)
         cursor.execute(comando)
         conn.commit()
-        cursor.execute("""select * from Empresa""")
-        for tabela in cursor.fetchall():
-            print(tabela)
         conn.close()
 
 
@@ -57,10 +53,11 @@ class TelaInicial(Frame):
     def __init__(self):
         super().__init__()
         self.master.title("Controle eSocial")
+        self.telaAtual = "inicial"
         menubar = Menu(self.master)
         self.master.config(menu = menubar)
         menuEmpresa = Menu(menubar)
-        menuEmpresa.add_command(label="Inclusão", command = TelaIncluir)
+        menuEmpresa.add_command(label="Inclusão", command = self.telaIncluir)
         menuEmpresa.add_command(label="Modificação", command = self.modificar)
         menuListagem = Menu(menubar)
         menuListagem.add_command(label="Listar pendentes da fase 1", command = self.listar1)
@@ -69,8 +66,35 @@ class TelaInicial(Frame):
         menubar.add_cascade(label = "Empresa", menu = menuEmpresa)
         menubar.add_cascade(label="Relatórios", menu=menuListagem)
 
+        # Incluir
+        self.master.title("Incluir Empresa")
+        self.lTitulo = Label(self.master, text="Incluir Empresa", font="Arial 14 bold")
+        self.lEmpresa = Label(self.master, text="Nome da Empresa:")
+        self.eEmpresa = Entry(self.master)
+        self.lCnpj = Label(self.master, text="CNPJ:")
+        self.eCnpj = Entry(self.master)
+        self.lFase1 = Label(self.master, text="Fase 1", font="Arial 10 bold")
+        self.enviou1=IntVar()
+        self.cEnviou1 = Checkbutton(self.master, text="Enviou", variable=self.enviou1)
+        self.passou1=IntVar()
+        self.cPassou1 = Checkbutton(self.master, text="Passou", variable=self.passou1)
+        self.lFase2 = Label(self.master, text="Fase 2", font="Arial 10 bold")
+        self.enviou2=IntVar()
+        self.cEnviou2 = Checkbutton(self.master, text="Enviou", variable=self.enviou2)
+        self.passou2=IntVar()
+        self.cPassou2 = Checkbutton(self.master, text="Passou", variable=self.passou2)
+        self.lFase3 = Label(self.master, text="Fase 3", font="Arial 10 bold")
+        self.enviou3=IntVar()
+        self.cEnviou3 = Checkbutton(self.master, text="Enviou", variable=self.enviou3)
+        self.passou3=IntVar()
+        self.cPassou3 = Checkbutton(self.master, text="Passou", variable=self.passou3)
+        self.lObs = Label(self.master, text="Observação:")
+        self.eObs = Entry(self.master)
+        self.bSalvar = Button(self.master, command=self.salvar, text="Salvar")
+        self.bLimpar = Button(self.master, command=self.limpar, text="Limpar")
 
     def modificar(self):
+        self.limparTela()
         pass
 
     def listar1(self):
@@ -82,43 +106,52 @@ class TelaInicial(Frame):
     def listar3(self):
         pass
 
-class TelaIncluir(TelaInicial):
-    def __init__(self):
-        super().__init__()
-        self.master.title("Incluir Empresa")
-        self.lTitulo = Label(self.master, text="Incluir Empresa", font="Arial 14 bold").grid(row=0)
-        self.lEmpresa = Label(self.master, text="Nome da Empresa:").grid(row=1)
-        self.eEmpresa = Entry(self.master)
+    def limparTela(self):
+        if(self.telaAtual == "inicial"):
+            pass
+        elif(self.telaAtual == "incluir"):
+            self.telaAtual = "incluir"
+            self.lTitulo.grid_remove()
+            self.lEmpresa.grid_remove()
+            self.eEmpresa.grid_remove()
+            self.lCnpj.grid_remove()
+            self.eCnpj.grid_remove()
+            self.lFase1.grid_remove()
+            self.cEnviou1.grid_remove()
+            self.cPassou1.grid_remove()
+            self.lFase2.grid_remove()
+            self.cEnviou2.grid_remove()
+            self.cPassou2.grid_remove()
+            self.lFase3.grid_remove()
+            self.cEnviou3.grid_remove()
+            self.cPassou3.grid_remove()
+            self.lObs.grid_remove()
+            self.eObs.grid_remove()
+            self.bSalvar.grid_remove()
+            self.bLimpar.grid_remove()
+
+
+    def telaIncluir(self):
+        self.limparTela()
+        self.telaAtual = "incluir"
+        self.lTitulo.grid(row=0)
+        self.lEmpresa.grid(row=1)
         self.eEmpresa.grid(row=1, column=1)
-        self.lCnpj = Label(self.master, text="CNPJ:").grid(row=2)
-        self.eCnpj = Entry(self.master)
+        self.lCnpj.grid(row=2)
         self.eCnpj.grid(row=2, column=1)
-        self.lFase1 = Label(self.master, text="Fase 1", font="Arial 10 bold").grid(row=3)
-        self.enviou1=IntVar()
-        self.cEnviou1 = Checkbutton(self.master, text="Enviou", variable=self.enviou1)
+        self.lFase1.grid(row=3)
         self.cEnviou1.grid(row=4, column=0)
-        self.passou1=IntVar()
-        self.cPassou1 = Checkbutton(self.master, text="Passou", variable=self.passou1)
         self.cPassou1.grid(row=4, column=1)
-        self.lFase2 = Label(self.master, text="Fase 2", font="Arial 10 bold").grid(row=5)
-        self.enviou2=IntVar()
-        self.cEnviou2 = Checkbutton(self.master, text="Enviou", variable=self.enviou2)
+        self.lFase2.grid(row=5)
         self.cEnviou2.grid(row=6, column=0)
-        self.passou2=IntVar()
-        self.cPassou2 = Checkbutton(self.master, text="Passou", variable=self.passou2)
         self.cPassou2.grid(row=6, column=1)
-        self.lFase3 = Label(self.master, text="Fase 3", font="Arial 10 bold").grid(row=7)
-        self.enviou3=IntVar()
-        self.cEnviou3 = Checkbutton(self.master, text="Enviou", variable=self.enviou3)
+        self.lFase3.grid(row=7)
         self.cEnviou3.grid(row=8, column=0)
-        self.passou3=IntVar()
-        self.cPassou3 = Checkbutton(self.master, text="Passou", variable=self.passou3)
         self.cPassou3.grid(row=8, column=1)
-        self.lObs = Label(self.master, text="Observação:").grid(row=9)
-        self.eObs = Entry(self.master)
+        self.lObs.grid(row=9)
         self.eObs.grid(row=9, column=1)
-        self.bSalvar = Button(self.master, command=self.salvar, text="Salvar").grid(row=10, column=0)
-        self.bLimpar = Button(self.master, command=self.limpar, text="Limpar").grid(row=10, column=5)
+        self.bSalvar.grid(row=10, column=0)
+        self.bLimpar.grid(row=10, column=5)
 
     def salvar(self):
         e = Empresa(self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
@@ -143,6 +176,7 @@ class TelaIncluir(TelaInicial):
         passou2=self.cPassou2.deselect()
         enviou3=self.cEnviou3.deselect()
         passou3=self.cPassou3.deselect()
+
 
 raiz = Tk()
 raiz.geometry("400x300")
