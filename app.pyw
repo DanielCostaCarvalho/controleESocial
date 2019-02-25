@@ -1,8 +1,9 @@
 from tkinter import *
+from tkinter import messagebox
 import sqlite3
 
 class Empresa:
-    def __init__(self, nome, cnpj, enviou1 = False, passou1 = False, enviou2 = False, passou2 = False, enviou3 = False, passou3 = False, observacao = ""):
+    def __init__(self, nome="", cnpj="", idEmpresa=0, enviou1 = False, passou1 = False, enviou2 = False, passou2 = False, enviou3 = False, passou3 = False, observacao = ""):
         self.nome = nome
         self.cnpj = cnpj
         self.enviou1 = enviou1
@@ -12,6 +13,7 @@ class Empresa:
         self.passou2 = passou2
         self.passou3 = passou3
         self.observacao = observacao
+        self.idEmpresa = idEmpresa
 
     def cadastrar(self):
         conn = sqlite3.connect('controleESocial.db')
@@ -21,6 +23,25 @@ class Empresa:
         conn.commit()
         conn.close()
 
+    def selecionar(self, idProcura):
+        conn = sqlite3.connect('controleESocial.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT nome, cnpj, enviou1, enviou2, enviou3, passou1, passou2, passou3, obs FROM Empresa where id = {};
+        """.format(idProcura))
+        for eNome, eCnpj, eEnviou1, eEnviou2, eEnviou3, ePassou1, ePassou2, ePassou3, eObs in cursor.fetchall():
+            self.nome = eNome
+            self.cnpj = eCnpj
+            self.enviou1 = int(eEnviou1)
+            self.enviou3 = int(eEnviou3)
+            self.enviou2 = int(eEnviou2)
+            self.passou1 = int(ePassou1)
+            self.passou2 = int(ePassou2)
+            self.passou3 = int(ePassou3)
+            self.observacao = eObs
+            self.idEmpresa = idProcura
+
+        conn.close()
 
     def __str__(self):
         if(self.enviou1 == 1):
@@ -58,7 +79,7 @@ class TelaInicial(Frame):
         self.master.config(menu = menubar)
         menuEmpresa = Menu(menubar)
         menuEmpresa.add_command(label="Inclusão", command = self.telaIncluir)
-        menuEmpresa.add_command(label="Modificação", command = self.modificar)
+        menuEmpresa.add_command(label="Modificação", command = self.selecionar)
         menuListagem = Menu(menubar)
         menuListagem.add_command(label="Listar pendentes da fase 1", command = self.listar1)
         menuListagem.add_command(label="Listar pendentes da fase 2", command = self.listar2)
@@ -67,8 +88,7 @@ class TelaInicial(Frame):
         menubar.add_cascade(label="Relatórios", menu=menuListagem)
 
         # Incluir
-        self.master.title("Incluir Empresa")
-        self.lTitulo = Label(self.master, text="Incluir Empresa", font="Arial 14 bold")
+        self.lTituloIncluir = Label(self.master, text="Incluir Empresa", font="Arial 14 bold")
         self.lEmpresa = Label(self.master, text="Nome da Empresa:")
         self.eEmpresa = Entry(self.master)
         self.lCnpj = Label(self.master, text="CNPJ:")
@@ -93,9 +113,28 @@ class TelaInicial(Frame):
         self.bSalvar = Button(self.master, command=self.salvar, text="Salvar")
         self.bLimpar = Button(self.master, command=self.limpar, text="Limpar")
 
-    def modificar(self):
+        # selecionar Empresa
+        self.lBEmpresas = Listbox(self.master)
+        self.listaEmpresas = []
+        self.bSelecionar = Button(self.master, command=self.bSelecionar, text="selecionar")
+
+
+    def selecionar(self):
         self.limparTela()
-        pass
+        self.master.title("Modificar Empresa")
+        self.telaAtual = "selecao"
+        conn = sqlite3.connect('controleESocial.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT id, nome, cnpj FROM Empresa order by nome collate nocase;
+        """)
+        for eId, eNome, eCnpj in cursor.fetchall():
+            self.lBEmpresas.insert(END, eNome + " | " + eCnpj)
+            self.listaEmpresas.append(eId)
+
+        conn.close()
+        self.lBEmpresas.grid()
+        self.bSelecionar.grid()
 
     def listar1(self):
         pass
@@ -109,9 +148,13 @@ class TelaInicial(Frame):
     def limparTela(self):
         if(self.telaAtual == "inicial"):
             pass
+        elif(self.telaAtual == "selecao"):
+            self.lBEmpresas.grid_remove()
+            self.bSelecionar.grid_remove()
+            self.lBEmpresas.delete(0,END)
+            self.listaEmpresas.clear()
         elif(self.telaAtual == "incluir"):
-            self.telaAtual = "incluir"
-            self.lTitulo.grid_remove()
+            self.lTituloIncluir.grid_remove()
             self.lEmpresa.grid_remove()
             self.eEmpresa.grid_remove()
             self.lCnpj.grid_remove()
@@ -133,8 +176,9 @@ class TelaInicial(Frame):
 
     def telaIncluir(self):
         self.limparTela()
+        self.master.title("Incluir Empresa")
         self.telaAtual = "incluir"
-        self.lTitulo.grid(row=0)
+        self.lTituloIncluir.grid(row=0)
         self.lEmpresa.grid(row=1)
         self.eEmpresa.grid(row=1, column=1)
         self.lCnpj.grid(row=2)
@@ -152,6 +196,16 @@ class TelaInicial(Frame):
         self.eObs.grid(row=9, column=1)
         self.bSalvar.grid(row=10, column=0)
         self.bLimpar.grid(row=10, column=5)
+
+#botões
+    def bSelecionar(self):
+        try:
+            emp = Empresa(idEmpresa = self.listaEmpresas[self.lBEmpresas.curselection()[0]])
+            emp.selecionar(self.listaEmpresas[self.lBEmpresas.curselection()[0]])
+            print(emp)
+        except:
+            messagebox.showinfo("Erro","Selecione uma empresa")
+
 
     def salvar(self):
         e = Empresa(self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
