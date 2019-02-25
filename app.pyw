@@ -111,16 +111,75 @@ class TelaInicial(Frame):
         self.lObs = Label(self.master, text="Observação:")
         self.eObs = Entry(self.master)
         self.bSalvar = Button(self.master, command=self.salvar, text="Salvar")
+        self.bAtualizar = Button(self.master, command=self.atualizar, text="Atualizar")
         self.bLimpar = Button(self.master, command=self.limpar, text="Limpar")
 
         # selecionar Empresa
+        self.lTituloSelecionar = Label(self.master, text="Selecionar Empresa", font="Arial 14 bold")
         self.lBEmpresas = Listbox(self.master)
         self.listaEmpresas = []
         self.bSelecionar = Button(self.master, command=self.bSelecionar, text="selecionar")
 
+        # modificar empresa
+        self.lTituloModificar = Label(self.master, text="Atualizar Empresa", font="Arial 14 bold")
+
+    def modificar(self, emp):
+        self.limparTela()
+        self.master.title("Atualizar Empresa")
+        self.telaAtual = "modificar"
+
+        self.eEmpresa.insert(0, string=emp.nome)
+        self.eCnpj.insert(0, string=emp.cnpj)
+
+        if(emp.enviou1 == 1):
+            self.cEnviou1.select()
+        else:
+            self.cEnviou1.deselect()
+        if(emp.enviou2 == 1):
+            self.cEnviou2.select()
+        else:
+            self.cEnviou2.deselect()
+        if(emp.enviou3 == 1):
+            self.cEnviou3.select()
+        else:
+            self.cEnviou3.deselect()
+        if(emp.passou1 == 1):
+            self.cPassou1.select()
+        else:
+            self.cPassou1.deselect()
+        if(emp.passou2 == 1):
+            self.cPassou2.select()
+        else:
+            self.cPassou2.deselect()
+        if(emp.passou3 == 1):
+            self.cPassou3.select()
+        else:
+            self.cPassou3.deselect()
+
+        self.eObs.insert(0, string=emp.observacao)
+
+        self.lTituloModificar.grid(row=0)
+        self.lEmpresa.grid(row=1)
+        self.eEmpresa.grid(row=1, column=1)
+        self.lCnpj.grid(row=2)
+        self.eCnpj.grid(row=2, column=1)
+        self.lFase1.grid(row=3)
+        self.cEnviou1.grid(row=4, column=0)
+        self.cPassou1.grid(row=4, column=1)
+        self.lFase2.grid(row=5)
+        self.cEnviou2.grid(row=6, column=0)
+        self.cPassou2.grid(row=6, column=1)
+        self.lFase3.grid(row=7)
+        self.cEnviou3.grid(row=8, column=0)
+        self.cPassou3.grid(row=8, column=1)
+        self.lObs.grid(row=9)
+        self.eObs.grid(row=9, column=1)
+        self.bAtualizar.grid(row=10, column=0)
+        self.bLimpar.grid(row=10, column=5)
 
     def selecionar(self):
         self.limparTela()
+        self.lTituloSelecionar.grid()
         self.master.title("Modificar Empresa")
         self.telaAtual = "selecao"
         conn = sqlite3.connect('controleESocial.db')
@@ -149,6 +208,7 @@ class TelaInicial(Frame):
         if(self.telaAtual == "inicial"):
             pass
         elif(self.telaAtual == "selecao"):
+            self.lTituloSelecionar.grid_remove()
             self.lBEmpresas.grid_remove()
             self.bSelecionar.grid_remove()
             self.lBEmpresas.delete(0,END)
@@ -202,14 +262,28 @@ class TelaInicial(Frame):
         try:
             emp = Empresa(idEmpresa = self.listaEmpresas[self.lBEmpresas.curselection()[0]])
             emp.selecionar(self.listaEmpresas[self.lBEmpresas.curselection()[0]])
-            print(emp)
+            self.modificar(emp)
         except:
             messagebox.showinfo("Erro","Selecione uma empresa")
 
 
     def salvar(self):
-        e = Empresa(self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
+        e = Empresa(nome=self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
         e.cadastrar()
+
+        self.eEmpresa.delete(0, 'end')
+        self.eObs.delete(0, 'end')
+        self.eCnpj.delete(0, 'end')
+        enviou1=self.cEnviou1.deselect()
+        passou1=self.cPassou1.deselect()
+        enviou2=self.cEnviou2.deselect()
+        passou2=self.cPassou2.deselect()
+        enviou3=self.cEnviou3.deselect()
+        passou3=self.cPassou3.deselect()
+
+    def atualizar(self):
+        e = Empresa(nome=self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
+        # e.atualizar()
 
         self.eEmpresa.delete(0, 'end')
         self.eObs.delete(0, 'end')
@@ -224,6 +298,7 @@ class TelaInicial(Frame):
     def limpar(self):
         self.eEmpresa.delete(0, 'end')
         self.eObs.delete(0, 'end')
+        self.eCnpj.delete(0, 'end')
         enviou1=self.cEnviou1.deselect()
         passou1=self.cPassou1.deselect()
         enviou2=self.cEnviou2.deselect()
