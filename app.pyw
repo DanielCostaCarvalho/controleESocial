@@ -126,6 +126,7 @@ class TelaInicial(Frame):
         # selecionar Empresa
         self.lTituloSelecionar = Label(self.master, text="Selecionar Empresa", font="Arial 14 bold")
         self.lBEmpresas = Listbox(self.master)
+        self.scrollbar = Scrollbar(self.lBEmpresas, orient="vertical")
         self.listaEmpresas = []
         self.bSelecionar = Button(self.master, command=self.bSelecionar, text="selecionar")
 
@@ -316,16 +317,7 @@ class TelaInicial(Frame):
     def atualizar(self):
         e = Empresa(nome=self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get(), idEmpresa=self.idEmpAtual)
         e.atualizar()
-
-        self.eEmpresa.delete(0, 'end')
-        self.eObs.delete(0, 'end')
-        self.eCnpj.delete(0, 'end')
-        enviou1=self.cEnviou1.deselect()
-        passou1=self.cPassou1.deselect()
-        enviou2=self.cEnviou2.deselect()
-        passou2=self.cPassou2.deselect()
-        enviou3=self.cEnviou3.deselect()
-        passou3=self.cPassou3.deselect()
+        messagebox.showinfo("Sucesso","Empresa atualizada com sucesso!")
 
     def limpar(self):
         self.eEmpresa.delete(0, 'end')
