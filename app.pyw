@@ -15,6 +15,14 @@ class Empresa:
         self.observacao = observacao
         self.idEmpresa = idEmpresa
 
+    def atualizar(self):
+        conn = sqlite3.connect('controleESocial.db')
+        cursor = conn.cursor()
+        comando="update Empresa set nome = '{}', enviou1 = {}, enviou2 = {}, enviou3 = {}, passou1 = {}, passou2 = {}, passou3 = {}, obs = '{}', cnpj = '{}' where id = {}".format(self.nome, self.enviou1, self.enviou2, self.enviou3, self.passou1, self.passou2, self.passou3, self.observacao, self.cnpj, self.idEmpresa)
+        cursor.execute(comando)
+        conn.commit()
+        conn.close()
+
     def cadastrar(self):
         conn = sqlite3.connect('controleESocial.db')
         cursor = conn.cursor()
@@ -71,6 +79,7 @@ class Empresa:
         return "Nome: {}\nCNPJ: {}\nFase1\nEnviou: {} Passou: {}\nFase2\nEnviou: {} Passou: {}\nFase3\nEnviou: {} Passou: {}\nObservação: {}\n\n".format(self.nome, self.cnpj, e1, p1, e2, p2, e3, p3, self.observacao)
 
 class TelaInicial(Frame):
+    idEmpAtual = 0
     def __init__(self):
         super().__init__()
         self.master.title("Controle eSocial")
@@ -127,6 +136,8 @@ class TelaInicial(Frame):
         self.limparTela()
         self.master.title("Atualizar Empresa")
         self.telaAtual = "modificar"
+
+        self.idEmpAtual = emp.idEmpresa
 
         self.eEmpresa.insert(0, string=emp.nome)
         self.eCnpj.insert(0, string=emp.cnpj)
@@ -233,6 +244,27 @@ class TelaInicial(Frame):
             self.bSalvar.grid_remove()
             self.bLimpar.grid_remove()
 
+        elif(self.telaAtual == "modificar"):
+            self.limpar()
+            self.lTituloModificar.grid_remove()
+            self.lEmpresa.grid_remove()
+            self.eEmpresa.grid_remove()
+            self.lCnpj.grid_remove()
+            self.eCnpj.grid_remove()
+            self.lFase1.grid_remove()
+            self.cEnviou1.grid_remove()
+            self.cPassou1.grid_remove()
+            self.lFase2.grid_remove()
+            self.cEnviou2.grid_remove()
+            self.cPassou2.grid_remove()
+            self.lFase3.grid_remove()
+            self.cEnviou3.grid_remove()
+            self.cPassou3.grid_remove()
+            self.lObs.grid_remove()
+            self.eObs.grid_remove()
+            self.bAtualizar.grid_remove()
+            self.bLimpar.grid_remove()
+
 
     def telaIncluir(self):
         self.limparTela()
@@ -282,8 +314,8 @@ class TelaInicial(Frame):
         passou3=self.cPassou3.deselect()
 
     def atualizar(self):
-        e = Empresa(nome=self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get())
-        # e.atualizar()
+        e = Empresa(nome=self.eEmpresa.get(), cnpj=self.eCnpj.get(),observacao=self.eObs.get(),enviou1=self.enviou1.get(),passou1=self.passou1.get(),enviou2=self.enviou2.get(),passou2=self.passou2.get(),enviou3=self.enviou3.get(),passou3=self.passou3.get(), idEmpresa=self.idEmpAtual)
+        e.atualizar()
 
         self.eEmpresa.delete(0, 'end')
         self.eObs.delete(0, 'end')
