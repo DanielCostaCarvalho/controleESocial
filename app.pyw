@@ -90,9 +90,9 @@ class TelaInicial(Frame):
         menuEmpresa.add_command(label="Inclusão", command = self.telaIncluir)
         menuEmpresa.add_command(label="Modificação", command = self.selecionar)
         menuListagem = Menu(menubar)
-        menuListagem.add_command(label="Listar pendentes da fase 1", command = self.listar1)
-        menuListagem.add_command(label="Listar pendentes da fase 2", command = self.listar2)
-        menuListagem.add_command(label="Listar pendentes da fase 3", command = self.listar3)
+        menuListagem.add_command(label="Listar pendentes da fase 1", command = self.rel1)
+        menuListagem.add_command(label="Listar pendentes da fase 2", command = self.rel2)
+        menuListagem.add_command(label="Listar pendentes da fase 3", command = self.rel3)
         menubar.add_cascade(label = "Empresa", menu = menuEmpresa)
         menubar.add_cascade(label="Relatórios", menu=menuListagem)
 
@@ -130,8 +130,74 @@ class TelaInicial(Frame):
         self.listaEmpresas = []
         self.bSelecionar = Button(self.master, command=self.bSelecionar, text="selecionar")
 
+        # Relatorio 1
+        self.lTituloRel1 = Label(self.master, text="Lista de pendentes da 1ª fase", font="Arial 14 bold")
+        self.lBEmpresasRel1 = Listbox(self.master)
+        self.scrollbarRel1 = Scrollbar(self.lBEmpresas, orient="vertical")
+
+        # Relatorio 2
+        self.lTituloRel2 = Label(self.master, text="Lista de pendentes da 2ª fase", font="Arial 14 bold")
+        self.lBEmpresasRel2 = Listbox(self.master)
+        self.scrollbarRel2 = Scrollbar(self.lBEmpresas, orient="vertical")
+
+        # Relatorio 3
+        self.lTituloRel3 = Label(self.master, text="Lista de pendentes da 3ª fase", font="Arial 14 bold")
+        self.lBEmpresasRel3 = Listbox(self.master)
+        self.scrollbarRel3 = Scrollbar(self.lBEmpresas, orient="vertical")
+
         # modificar empresa
         self.lTituloModificar = Label(self.master, text="Atualizar Empresa", font="Arial 14 bold")
+
+    def rel1(self):
+        self.limparTela()
+        self.lTituloRel1.grid()
+        self.master.title("Lista de pendentes da 1ª fase")
+        self.telaAtual = "rel1"
+        conn = sqlite3.connect('controleESocial.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT nome, cnpj FROM Empresa where passou1 = 0 order by nome collate nocase;
+        """)
+        for eNome, eCnpj in cursor.fetchall():
+            self.lBEmpresasRel1.insert(END, eNome + " | " + eCnpj)
+
+
+        conn.close()
+        self.lBEmpresasRel1.grid()
+
+    def rel2(self):
+        self.limparTela()
+        self.lTituloRel2.grid()
+        self.master.title("Lista de pendentes da 2ª fase")
+        self.telaAtual = "rel2"
+        conn = sqlite3.connect('controleESocial.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT nome, cnpj FROM Empresa where passou2 = 0 order by nome collate nocase;
+        """)
+        for eNome, eCnpj in cursor.fetchall():
+            self.lBEmpresasRel2.insert(END, eNome + " | " + eCnpj)
+
+
+        conn.close()
+        self.lBEmpresasRel2.grid()
+
+    def rel3(self):
+        self.limparTela()
+        self.lTituloRel3.grid()
+        self.master.title("Lista de pendentes da 3ª fase")
+        self.telaAtual = "rel3"
+        conn = sqlite3.connect('controleESocial.db')
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT nome, cnpj FROM Empresa where passou3 = 0 order by nome collate nocase;
+        """)
+        for eNome, eCnpj in cursor.fetchall():
+            self.lBEmpresasRel3.insert(END, eNome + " | " + eCnpj)
+
+
+        conn.close()
+        self.lBEmpresasRel3.grid()
 
     def modificar(self, emp):
         self.limparTela()
@@ -207,14 +273,6 @@ class TelaInicial(Frame):
         self.lBEmpresas.grid()
         self.bSelecionar.grid()
 
-    def listar1(self):
-        pass
-
-    def listar2(self):
-        pass
-
-    def listar3(self):
-        pass
 
     def limparTela(self):
         if(self.telaAtual == "inicial"):
@@ -225,6 +283,18 @@ class TelaInicial(Frame):
             self.bSelecionar.grid_remove()
             self.lBEmpresas.delete(0,END)
             self.listaEmpresas.clear()
+        elif(self.telaAtual == "rel1"):
+            self.lTituloRel1.grid_remove()
+            self.lBEmpresasRel1.grid_remove()
+            self.lBEmpresasRel1.delete(0,END)
+        elif(self.telaAtual == "rel2"):
+            self.lTituloRel2.grid_remove()
+            self.lBEmpresasRel2.grid_remove()
+            self.lBEmpresasRel2.delete(0,END)
+        elif(self.telaAtual == "rel3"):
+            self.lTituloRel3.grid_remove()
+            self.lBEmpresasRel3.grid_remove()
+            self.lBEmpresasRel3.delete(0,END)
         elif(self.telaAtual == "incluir"):
             self.lTituloIncluir.grid_remove()
             self.lEmpresa.grid_remove()
